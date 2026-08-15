@@ -291,12 +291,16 @@
   <!-- Stats -->
   <div class="stats">
     <div class="stat">
-      <div class="num">2</div>
+      <div class="num" id="stat-repos">-</div>
       <div class="label">公开仓库</div>
     </div>
     <div class="stat">
-      <div class="num">1</div>
-      <div class="label"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Stars</div>
+      <div class="num" id="stat-gh-stars">-</div>
+      <div class="label"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> GitHub Stars</div>
+    </div>
+    <div class="stat">
+      <div class="num" id="stat-gitee-stars">-</div>
+      <div class="label"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Gitee Stars</div>
     </div>
     <div class="stat">
       <div class="num">2026</div>
@@ -329,7 +333,7 @@
           <span class="tag"><span class="dot dot-js"></span> JavaScript</span>
           <span class="tag"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> MIT</span>
           <span class="tag"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 2026-08-15</span>
-          <span class="tag"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> 1</span>
+          <span class="tag" id="repo-stars-qwen"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> -</span>
         </div>
         <div class="repo-links">
           <a class="btn-gh" href="https://github.com/hxtx-hi/Qwen-Studio-Beautify" target="_blank">
@@ -368,7 +372,7 @@
           <span class="tag"><span class="dot dot-html"></span> HTML</span>
           <span class="tag"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> MIT</span>
           <span class="tag"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 2026-08-15</span>
-          <span class="tag"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> 0</span>
+          <span class="tag" id="repo-stars-snake"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> -</span>
         </div>
         <div class="repo-links">
           <a class="btn-gh" href="https://github.com/hxtx-hi/snakegame_theme" target="_blank">
@@ -418,6 +422,56 @@ function toggleTheme(){
     document.getElementById('themeKnob').innerHTML=saved==='light'?sunSVG:moonSVG;
   }
 })();
+
+// ===== Dynamic Stars =====
+var starSVG='<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
+
+// GitHub: fetch all repos, sum stargazers_count, update per-repo stars
+fetch('https://api.github.com/users/hxtx-hi/repos?per_page=100&sort=updated')
+  .then(function(r){ return r.json(); })
+  .then(function(repos){
+    if(!Array.isArray(repos)) return;
+    var total=0;
+    var ghRepoCount=0;
+    repos.forEach(function(repo){
+      if(!repo.fork) ghRepoCount++;
+      total += repo.stargazers_count || 0;
+      // Update per-repo star tags
+      if(repo.name==='Qwen-Studio-Beautify'){
+        var el=document.getElementById('repo-stars-qwen');
+        if(el) el.innerHTML=starSVG+' '+repo.stargazers_count;
+      }
+      if(repo.name==='snakegame_theme'){
+        var el2=document.getElementById('repo-stars-snake');
+        if(el2) el2.innerHTML=starSVG+' '+repo.stargazers_count;
+      }
+    });
+    var ghStarsEl=document.getElementById('stat-gh-stars');
+    if(ghStarsEl) ghStarsEl.textContent=total;
+    var reposEl=document.getElementById('stat-repos');
+    if(reposEl) reposEl.textContent=ghRepoCount;
+  })
+  .catch(function(){
+    var el=document.getElementById('stat-gh-stars');
+    if(el) el.textContent='?';
+  });
+
+// Gitee: fetch all repos, sum star_count
+fetch('https://gitee.com/api/v5/users/hxtx-hi/repos?per_page=100&sort=updated')
+  .then(function(r){ return r.json(); })
+  .then(function(repos){
+    if(!Array.isArray(repos)) return;
+    var total=0;
+    repos.forEach(function(repo){
+      total += repo.star_count || 0;
+    });
+    var el=document.getElementById('stat-gitee-stars');
+    if(el) el.textContent=total;
+  })
+  .catch(function(){
+    var el=document.getElementById('stat-gitee-stars');
+    if(el) el.textContent='?';
+  });
 </script>
 </body>
 </html>
