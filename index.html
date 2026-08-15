@@ -426,21 +426,16 @@ function toggleTheme(){
 // ===== Dynamic Stars =====
 var starSVG='<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
 
-// GitHub: fetch user profile for public_repos count + repos list for stars
-fetch('https://api.github.com/users/hxtx-hi')
-  .then(function(r){ return r.json(); })
-  .then(function(user){
-    var reposEl=document.getElementById('stat-repos');
-    if(reposEl && user.public_repos!==undefined) reposEl.textContent=user.public_repos;
-  })
-  .catch(function(){});
-
+// GitHub: fetch repos list for star count + repo count (excluding hxtx-hi.github.io)
 fetch('https://api.github.com/users/hxtx-hi/repos?per_page=100&sort=updated')
   .then(function(r){ return r.json(); })
   .then(function(repos){
     if(!Array.isArray(repos)) return;
     var total=0;
+    var ghRepoCount=0;
     repos.forEach(function(repo){
+      // Exclude the personal homepage repo
+      if(repo.name!=='hxtx-hi.github.io' && !repo.fork) ghRepoCount++;
       total += repo.stargazers_count || 0;
       // Update per-repo star tags
       if(repo.name==='Qwen-Studio-Beautify'){
@@ -454,20 +449,22 @@ fetch('https://api.github.com/users/hxtx-hi/repos?per_page=100&sort=updated')
     });
     var ghStarsEl=document.getElementById('stat-gh-stars');
     if(ghStarsEl) ghStarsEl.textContent=total;
+    var reposEl=document.getElementById('stat-repos');
+    if(reposEl) reposEl.textContent=ghRepoCount;
   })
   .catch(function(){
     var el=document.getElementById('stat-gh-stars');
     if(el) el.textContent='?';
   });
 
-// Gitee: fetch all repos, sum star_count
+// Gitee: fetch all repos, sum stargazers_count
 fetch('https://gitee.com/api/v5/users/hxtx-hi/repos?per_page=100&sort=updated')
   .then(function(r){ return r.json(); })
   .then(function(repos){
     if(!Array.isArray(repos)) return;
     var total=0;
     repos.forEach(function(repo){
-      total += repo.star_count || 0;
+      total += repo.stargazers_count || 0;
     });
     var el=document.getElementById('stat-gitee-stars');
     if(el) el.textContent=total;
