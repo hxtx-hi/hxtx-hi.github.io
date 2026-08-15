@@ -90,6 +90,7 @@
 
   /* ---- Header ---- */
   .header{display:flex;align-items:center;gap:28px;margin-bottom:44px}
+  .header-left{display:flex;align-items:center;gap:28px;flex:1}
   .avatar{
     width:112px;height:112px;border-radius:50%;
     border:3px solid var(--accent);
@@ -101,12 +102,22 @@
   .header-info h1{font-size:2rem;font-weight:700;letter-spacing:-.02em}
   .header-info .username{color:var(--accent);font-size:1.05rem;margin-top:3px;font-weight:500}
   .header-info .bio{color:var(--text2);margin-top:10px;line-height:1.6;font-size:.95rem}
-  .header-info .links{margin-top:14px;display:flex;gap:18px;flex-wrap:wrap}
-  .header-info .links a{
-    color:var(--text2);text-decoration:none;font-size:.85rem;
-    transition:color .2s;display:inline-flex;align-items:center;gap:4px;
+
+  .header-btns{display:flex;flex-direction:column;gap:10px;flex-shrink:0}
+  .header-btn{
+    display:flex;align-items:center;gap:8px;
+    width:180px;height:42px;padding:0 18px;
+    border-radius:10px;font-size:.88rem;font-weight:500;
+    text-decoration:none;color:var(--text);
+    background:var(--surface);border:1px solid var(--border);
+    box-shadow:var(--shadow);
+    transition:all .25s;
   }
-  .header-info .links a:hover{color:var(--accent)}
+  .header-btn:hover{
+    border-color:var(--accent);color:var(--accent);
+    box-shadow:0 0 16px var(--glow);transform:translateY(-1px);
+  }
+  .header-btn .ico{font-size:1.1rem;width:20px;text-align:center;flex-shrink:0}
 
   /* ---- Stats ---- */
   .stats{display:flex;gap:16px;margin-bottom:40px;flex-wrap:wrap}
@@ -228,7 +239,9 @@
   /* ---- Responsive ---- */
   @media(max-width:640px){
     .header{flex-direction:column;text-align:center}
-    .header-info .links{justify-content:center}
+    .header-left{flex-direction:column}
+    .header-btns{flex-direction:row;flex-wrap:wrap;justify-content:center}
+    .header-btn{width:160px}
     .stats{justify-content:center}
     .repo-card-top{flex-direction:column}
     .repo-card-top .right{align-self:flex-end;margin-top:-40px}
@@ -249,16 +262,24 @@
 
   <!-- Header -->
   <header class="header">
-    <img class="avatar" src="https://foruda.gitee.com/avatar/1782553262265850538/17255779_hxtx-hi_1782553262.jpeg" alt="hxtx-hi avatar">
-    <div class="header-info">
-      <h1>hxtx-hi</h1>
-      <div class="username">@hxtx-hi</div>
-      <p class="bio">Building cool stuff on the web ✨</p>
-      <div class="links">
-        <a href="https://github.com/hxtx-hi" target="_blank">🐙 GitHub</a>
-        <a href="https://gitee.com/hxtx-hi" target="_blank">📦 Gitee</a>
-        <a href="https://b23.tv/entEqVJ" target="_blank">📺 哔哩哔哩</a>
+    <div class="header-left">
+      <img class="avatar" src="https://foruda.gitee.com/avatar/1782553262265850538/17255779_hxtx-hi_1782553262.jpeg" alt="hxtx-hi avatar">
+      <div class="header-info">
+        <h1>hxtx-hi</h1>
+        <div class="username">@hxtx-hi</div>
+        <p class="bio">Building cool stuff on the web ✨</p>
       </div>
+    </div>
+    <div class="header-btns">
+      <a class="header-btn" href="https://github.com/hxtx-hi" target="_blank">
+        <span class="ico">🐙</span> GitHub
+      </a>
+      <a class="header-btn" href="https://gitee.com/hxtx-hi" target="_blank">
+        <span class="ico">📦</span> Gitee
+      </a>
+      <a class="header-btn" href="https://b23.tv/entEqVJ" target="_blank">
+        <span class="ico">📺</span> 哔哩哔哩
+      </a>
     </div>
   </header>
 
